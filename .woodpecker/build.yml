@@ -6,3 +6,10 @@ pipeline:
     image: golang
     commands:
       - go build
+  publish:
+    image: golang
+    commands:
+      - ./gitea-release-attacher -instance=https://codeberg.org -user=qwerty287 -repo=gitea-release-attacher -remove-others -filename=latest -path=gitea-release-attacher -token=$GITEA_ACCESS_TOKEN
+    secrets: [GITEA_ACCESS_TOKEN]
+    when:
+      event: [push, tag, deployment]

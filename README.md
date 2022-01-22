@@ -22,6 +22,10 @@ Usage of ./gitea-release-attacher:
         repo owner
 ```
 
+### CI/CD
+
+You can find a sample configuration that publishes the binary for this repository to the latest release at https://codeberg.org/qwerty287/gitea-release-attacher/src/branch/main/.woodpecker/build.yml#L9-L14. However, this does not use the `latest` file from the releases it published, instead it compiles it from source.
+
 ## Build
 
 ```sh
