@@ -15,6 +15,7 @@ var (
 	user = flag.String("user", "", "repo owner")
 	repo = flag.String("repo", "", "repo name")
 	path = flag.String("path", "", "filepath to be attached")
+	filename = flag.String("filename", "", "attachment filename")
 )
 
 func main() {
@@ -51,8 +52,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	p := strings.Split(*path, "/")
-	_, _, err = c.CreateReleaseAttachment(*user, *repo, releases[0].ID, file, p[len(p) - 1])
+	if *filename == "" {
+		p := strings.Split(*path, "/")
+		filename = &p[len(p) - 1]
+	}
+	_, _, err = c.CreateReleaseAttachment(*user, *repo, releases[0].ID, file, *filename)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
