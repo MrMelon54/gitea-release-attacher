@@ -27,3 +27,5 @@ Usage of ./gitea-release-attacher:
 ```sh
 go build
 ```
+
+If you would like to contribute, please format your code with `gofumpt` and make sure that it passes the `golangci-lint` linters.
