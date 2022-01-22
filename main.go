@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"flag"
+	"fmt"
 	"os"
 	"strings"
 
@@ -10,18 +10,18 @@ import (
 )
 
 var (
-	instance = flag.String("instance", "", "Gitea instance")
-	token = flag.String("token", "", "Gitea API token")
-	user = flag.String("user", "", "repo owner")
-	repo = flag.String("repo", "", "repo name")
-	path = flag.String("path", "", "filepath to be attached")
-	filename = flag.String("filename", "", "attachment filename")
+	instance     = flag.String("instance", "", "Gitea instance")
+	token        = flag.String("token", "", "Gitea API token")
+	user         = flag.String("user", "", "repo owner")
+	repo         = flag.String("repo", "", "repo name")
+	path         = flag.String("path", "", "filepath to be attached")
+	filename     = flag.String("filename", "", "attachment filename")
 	removeOthers = flag.Bool("remove-others", false, "remove other attachments with this name")
 )
 
 func main() {
 	flag.Parse()
-	
+
 	if *instance == "" || *user == "" || *repo == "" || *path == "" {
 		fmt.Println("incorrect arguments")
 		os.Exit(1)
@@ -49,7 +49,7 @@ func main() {
 
 	if *filename == "" {
 		p := strings.Split(*path, "/")
-		filename = &p[len(p) - 1]
+		filename = &p[len(p)-1]
 	}
 
 	if *removeOthers {
@@ -64,7 +64,7 @@ func main() {
 		}
 	}
 
-	file, err := os.OpenFile(*path, os.O_RDONLY, 0644)
+	file, err := os.OpenFile(*path, os.O_RDONLY, 0o644)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
