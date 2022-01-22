@@ -16,6 +16,7 @@ var (
 	repo = flag.String("repo", "", "repo name")
 	path = flag.String("path", "", "filepath to be attached")
 	filename = flag.String("filename", "", "attachment filename")
+	removeOthers = flag.Bool("remove-others", false, "remove other attachments with this name")
 )
 
 func main() {
@@ -46,16 +47,29 @@ func main() {
 		os.Exit(1)
 	}
 
+	if *filename == "" {
+		p := strings.Split(*path, "/")
+		filename = &p[len(p) - 1]
+	}
+
+	if *removeOthers {
+		for _, v := range releases[0].Attachments {
+			if v.Name == *filename {
+				_, err := c.DeleteReleaseAttachment(*user, *repo, releases[0].ID, v.ID)
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			}
+		}
+	}
+
 	file, err := os.OpenFile(*path, os.O_RDONLY, 0644)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	if *filename == "" {
-		p := strings.Split(*path, "/")
-		filename = &p[len(p) - 1]
-	}
 	_, _, err = c.CreateReleaseAttachment(*user, *repo, releases[0].ID, file, *filename)
 	if err != nil {
 		fmt.Println(err)
