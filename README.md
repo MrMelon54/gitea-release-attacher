@@ -22,9 +22,23 @@ Usage of ./gitea-release-attacher:
         repo owner
 ```
 
+### Environment variables
+
+Setting any option using environment variables is supported. The environment variables have the scheme `GITEA_RELEASE_ATTACHER_*`. You can replace the the `*` with these values:
+
+* `INSTANCE`
+* `TOKEN`
+* `USER`
+* `REPO`
+* `PATH`
+* `FILENAME`
+* `REMOVE_OTHERS`
+
+They have the same effects as the corresponding command line options, but the command line options are preferred.
+
 ### CI/CD
 
-You can find a sample configuration that publishes the binary for this repository to the latest release at https://codeberg.org/qwerty287/gitea-release-attacher/src/branch/main/.woodpecker/build.yml#L9-L14. However, this does not use the `latest` file from the releases it published, instead it compiles it from source.
+You can find a sample configuration that publishes the binary for this repository to the latest release at https://codeberg.org/qwerty287/gitea-release-attacher/src/branch/main/.woodpecker/build.yml#L9-L15. However, this does not use the `latest` file from the releases it published, instead it compiles it from source.
 
 ## Build
 

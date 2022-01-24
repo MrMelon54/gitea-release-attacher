@@ -4,7 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
+	"syscall"
 
 	"code.gitea.io/sdk/gitea"
 )
@@ -22,10 +24,69 @@ var (
 func main() {
 	flag.Parse()
 
-	if *instance == "" || *user == "" || *repo == "" || *path == "" {
-		fmt.Println("incorrect arguments")
-		os.Exit(1)
+	if *instance == "" {
+		i, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_INSTANCE")
+		if !ok {
+			fmt.Println("incorrect arguments: no instance")
+			os.Exit(1)
+		}
+		instance = &i
 	}
+
+	if *token == "" {
+		t, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_TOKEN")
+		if !ok {
+			fmt.Println("incorrect arguments: no token")
+			os.Exit(1)
+		}
+		token = &t
+	}
+
+	if *user == "" {
+		u, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_USER")
+		if !ok {
+			fmt.Println("incorrect arguments: no user")
+			os.Exit(1)
+		}
+		user = &u
+	}
+
+	if *repo == "" {
+		r, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_REPO")
+		if !ok {
+			fmt.Println("incorrect arguments: no repo")
+			os.Exit(1)
+		}
+		repo = &r
+	}
+
+	if *path == "" {
+		p, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_PATH")
+		if !ok {
+			fmt.Println("incorrect arguments: no path")
+			os.Exit(1)
+		}
+		path = &p
+	}
+
+	if *filename == "" {
+		f, _ := syscall.Getenv("GITEA_RELEASE_ATTACHER_FILENAME")
+		filename = &f
+	}
+
+	if *removeOthers == false {
+		r, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_REMOVE_OTHERS")
+		// only run this if it is set
+		if ok {
+			remove, err := strconv.ParseBool(r)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			removeOthers = &remove
+		}
+	}
+
 	c, err := gitea.NewClient(*instance, gitea.SetToken(*token))
 	if err != nil {
 		fmt.Println(err)
