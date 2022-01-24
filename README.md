@@ -7,19 +7,21 @@ Add an attachment to the latest Gitea release
 ```
 Usage of ./gitea-release-attacher:
   -filename string
-        attachment filename
+    	attachment filename
   -instance string
-        Gitea instance
+    	Gitea instance
   -path string
-        filepath to be attached
+    	filepath to be attached
+  -release-id int
+    	release ID to attach file
   -remove-others
-        remove other attachments with this name
+    	remove other attachments with this name
   -repo string
-        repo name
+    	repo name
   -token string
-        Gitea API token
+    	Gitea API token
   -user string
-        repo owner
+    	repo owner
 ```
 
 ### Environment variables
@@ -33,6 +35,7 @@ Setting any option using environment variables is supported. The environment var
 * `PATH`
 * `FILENAME`
 * `REMOVE_OTHERS`
+* `RELEASE_ID`
 
 They have the same effects as the corresponding command line options, but the command line options are preferred.
 

@@ -19,6 +19,7 @@ var (
 	path         = flag.String("path", "", "filepath to be attached")
 	filename     = flag.String("filename", "", "attachment filename")
 	removeOthers = flag.Bool("remove-others", false, "remove other attachments with this name")
+	releaseID    = flag.Int64("release-id", 0, "release ID to attach file")
 )
 
 func main() {
@@ -74,7 +75,7 @@ func main() {
 		filename = &f
 	}
 
-	if *removeOthers == false {
+	if !*removeOthers {
 		r, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_REMOVE_OTHERS")
 		// only run this if it is set
 		if ok {
@@ -87,25 +88,49 @@ func main() {
 		}
 	}
 
+	if *releaseID == 0 {
+		i, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_RELEASE_ID")
+		if ok {
+			i, err := strconv.ParseInt(i, 10, 64)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			releaseID = &i
+		}
+	}
+
 	c, err := gitea.NewClient(*instance, gitea.SetToken(*token))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	releases, _, err := c.ListReleases(*user, *repo, gitea.ListReleasesOptions{
-		ListOptions: gitea.ListOptions{
-			PageSize: 1,
-		},
-	})
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	var release *gitea.Release
+	if *releaseID == 0 {
+		releases, _, err := c.ListReleases(*user, *repo, gitea.ListReleasesOptions{
+			ListOptions: gitea.ListOptions{
+				PageSize: 1,
+			},
+		})
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 
-	if len(releases) != 1 {
-		fmt.Println("no releases")
-		os.Exit(1)
+		if len(releases) != 1 {
+			fmt.Println("no releases")
+			os.Exit(1)
+		}
+		release = releases[0]
+	} else {
+		r, _, err := c.GetRelease(*user, *repo, *releaseID)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		release = r
 	}
 
 	if *filename == "" {
@@ -114,9 +139,9 @@ func main() {
 	}
 
 	if *removeOthers {
-		for _, v := range releases[0].Attachments {
+		for _, v := range release.Attachments {
 			if v.Name == *filename {
-				_, err := c.DeleteReleaseAttachment(*user, *repo, releases[0].ID, v.ID)
+				_, err := c.DeleteReleaseAttachment(*user, *repo, release.ID, v.ID)
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)
@@ -131,7 +156,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	_, _, err = c.CreateReleaseAttachment(*user, *repo, releases[0].ID, file, *filename)
+	_, _, err = c.CreateReleaseAttachment(*user, *repo, release.ID, file, *filename)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
