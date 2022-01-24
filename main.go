@@ -72,7 +72,11 @@ func main() {
 	}
 
 	if *filename == "" {
-		f, _ := syscall.Getenv("GITEA_RELEASE_ATTACHER_FILENAME")
+		f, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_FILENAME")
+		if !ok {
+			p := strings.Split(*path, "/")
+			f = p[len(p)-1]
+		}
 		filename = &f
 	}
 
@@ -158,11 +162,6 @@ func main() {
 			os.Exit(1)
 		}
 		release = releases[0]
-	}
-
-	if *filename == "" {
-		p := strings.Split(*path, "/")
-		filename = &p[len(p)-1]
 	}
 
 	if *removeOthers {
