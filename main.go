@@ -20,6 +20,7 @@ var (
 	filename     = flag.String("filename", "", "attachment filename")
 	removeOthers = flag.Bool("remove-others", false, "remove other attachments with this name")
 	releaseID    = flag.Int64("release-id", 0, "release ID to attach file")
+	releaseTag   = flag.String("release-tag", "", "release tag to attach file")
 )
 
 func main() {
@@ -88,9 +89,11 @@ func main() {
 		}
 	}
 
+	releaseIDIsEnv := false
 	if *releaseID == 0 {
 		i, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_RELEASE_ID")
 		if ok {
+			releaseIDIsEnv = true
 			i, err := strconv.ParseInt(i, 10, 64)
 			if err != nil {
 				fmt.Println(err)
@@ -100,6 +103,22 @@ func main() {
 		}
 	}
 
+	releaseTagIsEnv := false
+	if *releaseTag == "" {
+		t, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_RELEASE_TAG")
+		releaseTagIsEnv = ok
+		releaseTag = &t
+	}
+
+	useReleaseID := true
+	if *releaseTag != "" && *releaseID != 0 {
+		if releaseIDIsEnv == releaseTagIsEnv {
+			fmt.Println("incorrect arguments: both release ID and tag set")
+			os.Exit(1)
+		}
+		useReleaseID = !releaseIDIsEnv
+	}
+
 	c, err := gitea.NewClient(*instance, gitea.SetToken(*token))
 	if err != nil {
 		fmt.Println(err)
@@ -107,7 +126,23 @@ func main() {
 	}
 
 	var release *gitea.Release
-	if *releaseID == 0 {
+	if *releaseID != 0 && useReleaseID {
+		r, _, err := c.GetRelease(*user, *repo, *releaseID)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		release = r
+	} else if *releaseTag != "" {
+		r, _, err := c.GetReleaseByTag(*user, *repo, *releaseTag)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		release = r
+	} else {
 		releases, _, err := c.ListReleases(*user, *repo, gitea.ListReleasesOptions{
 			ListOptions: gitea.ListOptions{
 				PageSize: 1,
@@ -123,14 +158,6 @@ func main() {
 			os.Exit(1)
 		}
 		release = releases[0]
-	} else {
-		r, _, err := c.GetRelease(*user, *repo, *releaseID)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		release = r
 	}
 
 	if *filename == "" {

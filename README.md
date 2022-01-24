@@ -14,6 +14,8 @@ Usage of ./gitea-release-attacher:
     	filepath to be attached
   -release-id int
     	release ID to attach file
+  -release-tag string
+    	release tag to attach file
   -remove-others
     	remove other attachments with this name
   -repo string
@@ -36,6 +38,7 @@ Setting any option using environment variables is supported. The environment var
 * `FILENAME`
 * `REMOVE_OTHERS`
 * `RELEASE_ID`
+* `RELEASE_TAG`
 
 They have the same effects as the corresponding command line options, but the command line options are preferred.
 
