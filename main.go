@@ -19,6 +19,7 @@ var (
 	path         = flag.String("path", "", "filepath to be attached")
 	filename     = flag.String("filename", "", "attachment filename")
 	removeOthers = flag.Bool("remove-others", false, "remove other attachments with this name")
+	removeAll    = flag.Bool("remove-all", false, "remove all attachments before attaching the new file")
 	releaseID    = flag.Int64("release-id", 0, "release ID to attach file")
 	releaseTag   = flag.String("release-tag", "", "release tag to attach file")
 )
@@ -93,6 +94,19 @@ func main() {
 		}
 	}
 
+	if !*removeAll {
+		r, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_REMOVE_ALL")
+		// only run this if it is set
+		if ok {
+			remove, err := strconv.ParseBool(r)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			removeAll = &remove
+		}
+	}
+
 	releaseIDIsEnv := false
 	if *releaseID == 0 {
 		i, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_RELEASE_ID")
@@ -164,9 +178,9 @@ func main() {
 		release = releases[0]
 	}
 
-	if *removeOthers {
+	if *removeOthers || *removeAll {
 		for _, v := range release.Attachments {
-			if v.Name == *filename {
+			if *removeAll || v.Name == *filename {
 				_, err := c.DeleteReleaseAttachment(*user, *repo, release.ID, v.ID)
 				if err != nil {
 					fmt.Println(err)

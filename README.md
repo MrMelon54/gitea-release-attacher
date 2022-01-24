@@ -16,6 +16,8 @@ Usage of ./gitea-release-attacher:
     	release ID to attach file
   -release-tag string
     	release tag to attach file
+  -remove-all
+    	remove all attachments before attaching the new file
   -remove-others
     	remove other attachments with this name
   -repo string
@@ -37,6 +39,7 @@ Setting any option using environment variables is supported. The environment var
 * `PATH`
 * `FILENAME`
 * `REMOVE_OTHERS`
+* `REMOVE_ALL`
 * `RELEASE_ID`
 * `RELEASE_TAG`
 
