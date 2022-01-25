@@ -7,9 +7,15 @@ pipeline:
     commands:
       - go build
   publish:
-    image: golang
-    commands:
-      - ./gitea-release-attacher -instance=https://codeberg.org -user=qwerty287 -repo=gitea-release-attacher -remove-others -filename=latest -path=gitea-release-attacher -token=$GITEA_ACCESS_TOKEN
+    image: qwerty287/gitea-release-attacher
+    environment:
+      - GITEA_RELEASE_ATTACHER_INSTANCE=https://codeberg.org
+      - GITEA_RELEASE_ATTACHER_TOKEN=$GITEA_ACCESS_TOKEN
+      - GITEA_RELEASE_ATTACHER_USER=qwerty287
+      - GITEA_RELEASE_ATTACHER_REPO=gitea-release-attacher
+      - GITEA_RELEASE_ATTACHER_REMOVE_OTHERS=1
+      - GITEA_RELEASE_ATTACHER_FILENAME=latest
+      - GITEA_RELEASE_ATTACHER_PATH=gitea-release-attacher
     secrets: [GITEA_ACCESS_TOKEN]
     when:
       event: [push, tag, deployment]
