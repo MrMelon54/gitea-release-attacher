@@ -20,6 +20,8 @@ var (
 	filename     = flag.String("filename", "", "attachment filename")
 	removeOthers = flag.Bool("remove-others", false, "remove other attachments with this name")
 	removeAll    = flag.Bool("remove-all", false, "remove all attachments before attaching the new file")
+	drafts       = flag.Bool("drafts", false, "publish also to draft releases")
+	preRelease   = flag.Bool("pre-release", false, "publish also to pre releases")
 	releaseID    = flag.Int64("release-id", 0, "release ID to attach file")
 	releaseTag   = flag.String("release-tag", "", "release tag to attach file")
 )
@@ -107,6 +109,41 @@ func main() {
 		}
 	}
 
+	if !*drafts {
+		dEnv, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_DRAFTS")
+		// only run this if it is set
+		if ok {
+			d, err := strconv.ParseBool(dEnv)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			drafts = &d
+		}
+	}
+
+	preReleaseSet := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "pre-release" {
+			preReleaseSet = true
+		}
+	})
+
+	if !preReleaseSet {
+		pEnv, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_PRE_RELEASE")
+		// only run this if it is set
+		if ok {
+			p, err := strconv.ParseBool(pEnv)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			preRelease = &p
+		} else {
+			preRelease = nil
+		}
+	}
+
 	releaseIDIsEnv := false
 	if *releaseID == 0 {
 		i, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_RELEASE_ID")
@@ -165,6 +202,8 @@ func main() {
 			ListOptions: gitea.ListOptions{
 				PageSize: 1,
 			},
+			IsDraft:      drafts,
+			IsPreRelease: preRelease,
 		})
 		if err != nil {
 			fmt.Println(err)

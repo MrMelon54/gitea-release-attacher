@@ -6,12 +6,16 @@ Add an attachment to the latest Gitea release
 
 ```
 Usage of ./gitea-release-attacher:
+  -drafts
+    	publish also to draft releases
   -filename string
     	attachment filename
   -instance string
     	Gitea instance
   -path string
     	filepath to be attached
+  -pre-release
+    	publish also to pre releases
   -release-id int
     	release ID to attach file
   -release-tag string
@@ -40,6 +44,8 @@ Setting any option using environment variables is supported. The environment var
 * `FILENAME`
 * `REMOVE_OTHERS`
 * `REMOVE_ALL`
+* `DRAFTS`
+* `PRE_RELEASE`
 * `RELEASE_ID`
 * `RELEASE_TAG`
 
