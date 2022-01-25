@@ -51,9 +51,9 @@ Setting any option using environment variables is supported. The environment var
 
 They have the same effects as the corresponding command line options, but the command line options are preferred.
 
-### CI/CD
+### Docker
 
-You can find a sample configuration that publishes the binary for this repository to the latest release at https://codeberg.org/qwerty287/gitea-release-attacher/src/branch/main/.woodpecker/build.yml#L9-L15. However, this does not use the `latest` file from the releases it published, instead it compiles it from source.
+A Docker image is provided at [qwerty287/gitea-release-attacher](https://hub.docker.com/r/qwerty287/gitea-release-attacher). This has the application as entrypoint, it is recommended to use environment variables.
 
 ## Build
 
