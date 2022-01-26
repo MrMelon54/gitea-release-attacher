@@ -1,4 +1,6 @@
 linters:
   enable:
+    - forbidigo
     - gofumpt
+    - gosec
     - revive

@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -32,8 +32,7 @@ func main() {
 	if *instance == "" {
 		i, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_INSTANCE")
 		if !ok {
-			fmt.Println("incorrect arguments: no instance")
-			os.Exit(1)
+			log.Fatal("incorrect arguments: no instance")
 		}
 		instance = &i
 	}
@@ -41,8 +40,7 @@ func main() {
 	if *token == "" {
 		t, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_TOKEN")
 		if !ok {
-			fmt.Println("incorrect arguments: no token")
-			os.Exit(1)
+			log.Fatal("incorrect arguments: no token")
 		}
 		token = &t
 	}
@@ -50,8 +48,7 @@ func main() {
 	if *user == "" {
 		u, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_USER")
 		if !ok {
-			fmt.Println("incorrect arguments: no user")
-			os.Exit(1)
+			log.Fatal("incorrect arguments: no user")
 		}
 		user = &u
 	}
@@ -59,8 +56,7 @@ func main() {
 	if *repo == "" {
 		r, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_REPO")
 		if !ok {
-			fmt.Println("incorrect arguments: no repo")
-			os.Exit(1)
+			log.Fatal("incorrect arguments: no repo")
 		}
 		repo = &r
 	}
@@ -68,8 +64,7 @@ func main() {
 	if *path == "" {
 		p, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_PATH")
 		if !ok {
-			fmt.Println("incorrect arguments: no path")
-			os.Exit(1)
+			log.Fatal("incorrect arguments: no path")
 		}
 		path = &p
 	}
@@ -89,8 +84,7 @@ func main() {
 		if ok {
 			remove, err := strconv.ParseBool(r)
 			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
+				log.Fatal(err)
 			}
 			removeOthers = &remove
 		}
@@ -102,8 +96,7 @@ func main() {
 		if ok {
 			remove, err := strconv.ParseBool(r)
 			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
+				log.Fatal(err)
 			}
 			removeAll = &remove
 		}
@@ -115,8 +108,7 @@ func main() {
 		if ok {
 			d, err := strconv.ParseBool(dEnv)
 			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
+				log.Fatal(err)
 			}
 			drafts = &d
 		}
@@ -135,8 +127,7 @@ func main() {
 		if ok {
 			p, err := strconv.ParseBool(pEnv)
 			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
+				log.Fatal(err)
 			}
 			preRelease = &p
 		} else {
@@ -151,8 +142,7 @@ func main() {
 			releaseIDIsEnv = true
 			i, err := strconv.ParseInt(i, 10, 64)
 			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
+				log.Fatal(err)
 			}
 			releaseID = &i
 		}
@@ -168,32 +158,28 @@ func main() {
 	useReleaseID := true
 	if *releaseTag != "" && *releaseID != 0 {
 		if releaseIDIsEnv == releaseTagIsEnv {
-			fmt.Println("incorrect arguments: both release ID and tag set")
-			os.Exit(1)
+			log.Fatal("incorrect arguments: both release ID and tag set")
 		}
 		useReleaseID = !releaseIDIsEnv
 	}
 
 	c, err := gitea.NewClient(*instance, gitea.SetToken(*token))
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	var release *gitea.Release
 	if *releaseID != 0 && useReleaseID {
 		r, _, err := c.GetRelease(*user, *repo, *releaseID)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		release = r
 	} else if *releaseTag != "" {
 		r, _, err := c.GetReleaseByTag(*user, *repo, *releaseTag)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		release = r
@@ -206,13 +192,11 @@ func main() {
 			IsPreRelease: preRelease,
 		})
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		if len(releases) != 1 {
-			fmt.Println("no releases")
-			os.Exit(1)
+			log.Fatal("no releases")
 		}
 		release = releases[0]
 	}
@@ -222,8 +206,7 @@ func main() {
 			if *removeAll || v.Name == *filename {
 				_, err := c.DeleteReleaseAttachment(*user, *repo, release.ID, v.ID)
 				if err != nil {
-					fmt.Println(err)
-					os.Exit(1)
+					log.Fatal(err)
 				}
 			}
 		}
@@ -231,13 +214,11 @@ func main() {
 
 	file, err := os.OpenFile(*path, os.O_RDONLY, 0o644)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	_, _, err = c.CreateReleaseAttachment(*user, *repo, release.ID, file, *filename)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
