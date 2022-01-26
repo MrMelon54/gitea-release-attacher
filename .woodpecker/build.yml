@@ -10,12 +10,11 @@ pipeline:
     image: qwerty287/gitea-release-attacher:v1.1.0
     environment:
       - GITEA_RELEASE_ATTACHER_INSTANCE=https://codeberg.org
-      - GITEA_RELEASE_ATTACHER_TOKEN=$GITEA_ACCESS_TOKEN
       - GITEA_RELEASE_ATTACHER_USER=qwerty287
       - GITEA_RELEASE_ATTACHER_REPO=gitea-release-attacher
       - GITEA_RELEASE_ATTACHER_REMOVE_OTHERS=1
       - GITEA_RELEASE_ATTACHER_FILENAME=latest
       - GITEA_RELEASE_ATTACHER_PATH=gitea-release-attacher
-    secrets: [GITEA_ACCESS_TOKEN]
+    secrets: [GITEA_RELEASE_ATTACHER_TOKEN]
     when:
       event: [push, tag, deployment]
