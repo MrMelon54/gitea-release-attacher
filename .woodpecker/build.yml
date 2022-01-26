@@ -7,7 +7,7 @@ pipeline:
     commands:
       - go build
   publish:
-    image: qwerty287/gitea-release-attacher
+    image: qwerty287/gitea-release-attacher:v1.1.0
     environment:
       - GITEA_RELEASE_ATTACHER_INSTANCE=https://codeberg.org
       - GITEA_RELEASE_ATTACHER_TOKEN=$GITEA_ACCESS_TOKEN
