@@ -53,7 +53,7 @@ They have the same effects as the corresponding command line options, but the co
 
 ### Docker
 
-A Docker image is provided at [qwerty287/gitea-release-attacher](https://hub.docker.com/r/qwerty287/gitea-release-attacher). This has the application as entrypoint, it is recommended to use environment variables.
+A Docker image is provided at [qwerty287/gitea-release-attacher](https://hub.docker.com/r/qwerty287/gitea-release-attacher). This has the application as entrypoint, it is recommended to use environment variables. It also supports the `PLUGIN_*` environment variables, so if you are using [Woodpecker](https://woodpecker-ci.org/) or any compatible CI system, you can use it together with the [plugin settings](https://woodpecker-ci.org/docs/usage/plugins/plugins).
 
 ## Build
 

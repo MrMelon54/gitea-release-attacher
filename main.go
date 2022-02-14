@@ -29,8 +29,16 @@ var (
 func main() {
 	flag.Parse()
 
+	getenv := func(name string) (string, bool) {
+		i, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_" + name)
+		if ok {
+			return i, true
+		}
+		return syscall.Getenv("PLUGIN_" + name)
+	}
+
 	if *instance == "" {
-		i, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_INSTANCE")
+		i, ok := getenv("INSTANCE")
 		if !ok {
 			log.Fatal("incorrect arguments: no instance")
 		}
@@ -38,7 +46,7 @@ func main() {
 	}
 
 	if *token == "" {
-		t, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_TOKEN")
+		t, ok := getenv("TOKEN")
 		if !ok {
 			log.Fatal("incorrect arguments: no token")
 		}
@@ -46,7 +54,7 @@ func main() {
 	}
 
 	if *user == "" {
-		u, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_USER")
+		u, ok := getenv("USER")
 		if !ok {
 			log.Fatal("incorrect arguments: no user")
 		}
@@ -54,7 +62,7 @@ func main() {
 	}
 
 	if *repo == "" {
-		r, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_REPO")
+		r, ok := getenv("REPO")
 		if !ok {
 			log.Fatal("incorrect arguments: no repo")
 		}
@@ -62,7 +70,7 @@ func main() {
 	}
 
 	if *path == "" {
-		p, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_PATH")
+		p, ok := getenv("PATH")
 		if !ok {
 			log.Fatal("incorrect arguments: no path")
 		}
@@ -70,7 +78,7 @@ func main() {
 	}
 
 	if *filename == "" {
-		f, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_FILENAME")
+		f, ok := getenv("FILENAME")
 		if !ok {
 			p := strings.Split(*path, "/")
 			f = p[len(p)-1]
@@ -79,7 +87,7 @@ func main() {
 	}
 
 	if !*removeOthers {
-		r, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_REMOVE_OTHERS")
+		r, ok := getenv("REMOVE_OTHERS")
 		// only run this if it is set
 		if ok {
 			remove, err := strconv.ParseBool(r)
@@ -91,7 +99,7 @@ func main() {
 	}
 
 	if !*removeAll {
-		r, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_REMOVE_ALL")
+		r, ok := getenv("REMOVE_ALL")
 		// only run this if it is set
 		if ok {
 			remove, err := strconv.ParseBool(r)
@@ -103,7 +111,7 @@ func main() {
 	}
 
 	if !*drafts {
-		dEnv, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_DRAFTS")
+		dEnv, ok := getenv("DRAFTS")
 		// only run this if it is set
 		if ok {
 			d, err := strconv.ParseBool(dEnv)
@@ -122,7 +130,7 @@ func main() {
 	})
 
 	if !preReleaseSet {
-		pEnv, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_PRE_RELEASE")
+		pEnv, ok := getenv("PRE_RELEASE")
 		// only run this if it is set
 		if ok {
 			p, err := strconv.ParseBool(pEnv)
@@ -137,7 +145,7 @@ func main() {
 
 	releaseIDIsEnv := false
 	if *releaseID == 0 {
-		i, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_RELEASE_ID")
+		i, ok := getenv("RELEASE_ID")
 		if ok {
 			releaseIDIsEnv = true
 			i, err := strconv.ParseInt(i, 10, 64)
@@ -150,7 +158,7 @@ func main() {
 
 	releaseTagIsEnv := false
 	if *releaseTag == "" {
-		t, ok := syscall.Getenv("GITEA_RELEASE_ATTACHER_RELEASE_TAG")
+		t, ok := getenv("RELEASE_TAG")
 		releaseTagIsEnv = ok
 		releaseTag = &t
 	}
