@@ -82,6 +82,7 @@ func main() {
 		log.Fatal("incorrect arguments: " + strings.Join(errors, ", "))
 	}
 
+
 	if *filename == "" {
 		f, ok := getenv("FILENAME")
 		if !ok {
@@ -115,7 +116,17 @@ func main() {
 		}
 	}
 
-	if !*drafts {
+	draftsSet := false
+	preReleaseSet := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "drafts" {
+			draftsSet = true
+		} else if f.Name == "pre-release" {
+			preReleaseSet = true
+		}
+	})
+
+	if !draftsSet {
 		dEnv, ok := getenv("DRAFTS")
 		// only run this if it is set
 		if ok {
@@ -124,15 +135,10 @@ func main() {
 				log.Fatal(err)
 			}
 			drafts = &d
+		} else {
+			drafts = nil
 		}
 	}
-
-	preReleaseSet := false
-	flag.Visit(func(f *flag.Flag) {
-		if f.Name == "pre-release" {
-			preReleaseSet = true
-		}
-	})
 
 	if !preReleaseSet {
 		pEnv, ok := getenv("PRE_RELEASE")
