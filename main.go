@@ -37,10 +37,11 @@ func main() {
 		return syscall.Getenv("PLUGIN_" + name)
 	}
 
+	errors := []string{}
 	if *instance == "" {
 		i, ok := getenv("INSTANCE")
 		if !ok {
-			log.Fatal("incorrect arguments: no instance")
+			errors = append(errors, "no instance")
 		}
 		instance = &i
 	}
@@ -48,7 +49,7 @@ func main() {
 	if *token == "" {
 		t, ok := getenv("TOKEN")
 		if !ok {
-			log.Fatal("incorrect arguments: no token")
+			errors = append(errors, "no token")
 		}
 		token = &t
 	}
@@ -56,7 +57,7 @@ func main() {
 	if *user == "" {
 		u, ok := getenv("USER")
 		if !ok {
-			log.Fatal("incorrect arguments: no user")
+			errors = append(errors, "no user")
 		}
 		user = &u
 	}
@@ -64,7 +65,7 @@ func main() {
 	if *repo == "" {
 		r, ok := getenv("REPO")
 		if !ok {
-			log.Fatal("incorrect arguments: no repo")
+			errors = append(errors, "no repository")
 		}
 		repo = &r
 	}
@@ -72,9 +73,13 @@ func main() {
 	if *path == "" {
 		p, ok := getenv("PATH")
 		if !ok {
-			log.Fatal("incorrect arguments: no path")
+			errors = append(errors, "no path")
 		}
 		path = &p
+	}
+
+	if len(errors) > 0 {
+		log.Fatal("incorrect arguments: " + strings.Join(errors, ", "))
 	}
 
 	if *filename == "" {
