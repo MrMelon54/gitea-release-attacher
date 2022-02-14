@@ -4,7 +4,7 @@ Add an attachment to the latest Gitea release
 
 ## Usage
 
-```
+```text
 Usage of ./gitea-release-attacher:
   -drafts
     	publish also to draft releases
