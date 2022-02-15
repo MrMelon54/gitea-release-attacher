@@ -54,20 +54,26 @@ func main() {
 		token = &t
 	}
 
-	if *user == "" {
-		u, ok := getenv("USER")
-		if !ok {
-			errors = append(errors, "no user")
-		}
-		user = &u
-	}
-
 	if *repo == "" {
 		r, ok := getenv("REPO")
 		if !ok {
 			errors = append(errors, "no repository")
 		}
 		repo = &r
+	}
+
+	if *user == "" {
+		u, ok := getenv("USER")
+		if !ok {
+			if strings.Contains(*repo, "/") {
+				u = strings.Split(*repo, "/")[0]
+				r := strings.Split(*repo, "/")[1]
+				repo = &r
+			} else {
+				errors = append(errors, "no user")
+			}
+		}
+		user = &u
 	}
 
 	if *path == "" {
