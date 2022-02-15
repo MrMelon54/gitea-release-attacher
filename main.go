@@ -82,7 +82,6 @@ func main() {
 		log.Fatal("incorrect arguments: " + strings.Join(errors, ", "))
 	}
 
-
 	if *filename == "" {
 		f, ok := getenv("FILENAME")
 		if !ok {
