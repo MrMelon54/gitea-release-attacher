@@ -34,6 +34,7 @@ func main() {
 		if ok {
 			return i, true
 		}
+
 		return syscall.Getenv("PLUGIN_" + name)
 	}
 
