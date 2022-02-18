@@ -84,10 +84,6 @@ func main() {
 		path = &p
 	}
 
-	if len(errors) > 0 {
-		log.Fatal("incorrect arguments: " + strings.Join(errors, ", "))
-	}
-
 	if *filename == "" {
 		f, ok := getenv("FILENAME")
 		if !ok {
@@ -182,9 +178,13 @@ func main() {
 	useReleaseID := true
 	if *releaseTag != "" && *releaseID != 0 {
 		if releaseIDIsEnv == releaseTagIsEnv {
-			log.Fatal("incorrect arguments: both release ID and tag set")
+			errors = append(errors, "both release ID and tag set")
 		}
 		useReleaseID = !releaseIDIsEnv
+	}
+
+	if len(errors) > 0 {
+		log.Fatal("incorrect arguments: " + strings.Join(errors, ", "))
 	}
 
 	c, err := gitea.NewClient(*instance, gitea.SetToken(*token))
